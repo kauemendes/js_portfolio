@@ -1,9 +1,13 @@
-const videosContainer = document.getElementById('videoContainer');
+const videosContainer = document.getElementById('videosContainer');
 const videoIdInput = document.getElementById("videoId");
+const popup = document.getElementById("popup");
+const videoEl = document.querySelector("#popup > iframe");
+
 let youTubeVideoIds = [];
+const IDS_KEYS = "youTubeVideoIds"
 
 const loadVideos = () => {
-  youTubeVideoIds = JSON.parse(localStorage.getItem("youTubeVideoIds")) || [];
+  youTubeVideoIds = JSON.parse(localStorage.getItem(IDS_KEYS)) || [];
 }
 
 const displayVideos = () => {
@@ -16,13 +20,32 @@ const displayVideos = () => {
   videosContainer.innerHTML = videosHTMLStrings;
 }
 
+const clickVideo = (e, id) => {
+  if (e.target.classList.contains('delete-btn')) {
+    youTubeVideoIds = youTubeVideoIds.filter(i => i !== id);
+    console.log(id, youTubeVideoIds)
+    localStorage.setItem(IDS_KEYS, JSON.stringify(youTubeVideoIds));
+    displayVideos()
+  } else {
+    videoEl.src = `https://www.youtube.com/embed/${id}`;
+    popup.classList.add('open');
+    popup.classList.remove('closed');
+
+  }
+}
+
 const saveVideo = (e) => {
   e.preventDefault();
   const videoId = videoIdInput.value;
   youTubeVideoIds.unshift(videoId);
   videoIdInput.value = "";
-  localStorage.setItem("youTubeVideoIds", JSON.stringify(youTubeVideoIds));
+  localStorage.setItem(IDS_KEYS, JSON.stringify(youTubeVideoIds));
   displayVideos();
+}
+
+const handlePopupClick = () => {
+  popup.classList.add('closed');
+  popup.classList.remove('open');
 }
 
 loadVideos()
